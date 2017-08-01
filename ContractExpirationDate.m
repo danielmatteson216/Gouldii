@@ -6,7 +6,7 @@ Month = cell(length(CONTRACT_NAMES_ONLINE_DOWNLOADED),1);
 Yearint = cell(length(CONTRACT_NAMES_ONLINE_DOWNLOADED),1);
 onesarray = ones(length(CONTRACT_NAMES_ONLINE_DOWNLOADED),1);
 month_input = zeros(length(CONTRACT_NAMES_ONLINE_DOWNLOADED),1);
-
+%did this change follow through?
 
     for i = 1 : length(CONTRACT_NAMES_ONLINE_DOWNLOADED)
         
