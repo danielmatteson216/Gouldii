@@ -1,8 +1,9 @@
+function TnP = Gouldii_TradesPerformanceFunctionGUI(Serial_enddate,Serial_startdate,VIX, sig, SERIAL_DATE_DATA, TargetWeightVX1, TargetWeightVX2, TradeDate, ExpDates, ContractExpirations, ContractsAsStructure_RowsAsDates,TradeDate_NumFormat,T1,T2,stoploss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD);
 
-%load('Volatility_Signals_linearopt.mat');
+%[nr,nc] = size(SERIAL_DATE_DATA);
+nr = Serial_enddate - Serial_startdate+1; 
+nc = 1;
 
-function TnP = Gouldii_TradesPerformanceFunction(VIX, sig, SERIAL_DATE_DATA, TargetWeightVX1, TargetWeightVX2, TradeDate, ExpDates, ContractExpirations, ContractsAsStructure_RowsAsDates,TradeDate_NumFormat,T1,T2,stoploss,TradeDay,CONTANGO,CONTANGO30,ROLL_YIELD)
-[nr,nc] = size(SERIAL_DATE_DATA);
 %nr = nr + 1;
 Commish = .001;
 
@@ -260,7 +261,6 @@ for i = 1:nr
             else
                 TradeVX1TargetMonday(i,1) = 0;                                     
                 TradeVX2TargetMonday(i,1) = 0;
-                PortfolioCashMonday(i,1) = 0;
                 TradeVX1ActualMonday(i,1) = 0;
                 TradeVX2ActualMonday(i,1) = 0;
                 TradeVX1ContractsMonday(i,1) = 0;
@@ -392,7 +392,7 @@ PortfolioLabels = {'TradeDate','TradeDay','T1','T2','VX1OpenPrice','VX1LowPrice'
                    'TradeVX1Actual', 'TradeVX2Target', 'TradeVX2Contracts', 'TradeVX2Actual', 'PortfolioCash', 'PortfolioMktValPre', 'PortfolioNetLiqPre', 'PortfolioMktValPost', 'PortfolioNetLiqPost', 'PositionVX1Pre', ...
                    'PositionVX1Post','PortfolioVX1ContractsPre', 'PortfolioVX1ContractsPost', 'PositionVX2Pre', 'PositionVX2Post','PortfolioVX2ContractsPre', 'PortfolioVX2ContractsPost', 'ExposureVX1Pre', 'ExposureVX1Post', 'ExposureVX2Pre', ...
                    'ExposureVX2Post', 'DailyPL', 'DailyROR', 'CummPL', 'CummROR','CummSharpeRatio', ...
-                   'TradeVX1TargetMonday','TradeVX2TargetMonday','PortfolioCashMonday','TradeVX1ActualMonday', ...
+                   'TradeVX1TargetMonday','TradeVX2TargetMonday','TradeVX1ActualMonday', ...
                    'TradeVX2ActualMonday','VIX','CONTANGO','CONTANGO30','ROLL_YIELD'};
 
 InitialValues = [0,0,0,0,0,0,0,0,0,0, ...
@@ -400,7 +400,7 @@ InitialValues = [0,0,0,0,0,0,0,0,0,0, ...
                  0,0,0,0,PortfolioCashInitial,0,0,0,PortfolioCashInitial, 0, ...
                  0,0,0,0,0,0,0,0,0,0, ...
                  0,0,0,0,0,0, ...
-                 0,0,0,0, ...
+                 0,0,0, ...
                  0,0,0,0,0];
 
 TotalPortfolio = [TradeDate_NumFormat,TradeDay,T1,T2,VX1OpenPrice,VX1LowPrice,VX1Price,VX1HighPrice,VX2OpenPrice,VX2LowPrice, ...
@@ -408,18 +408,22 @@ TotalPortfolio = [TradeDate_NumFormat,TradeDay,T1,T2,VX1OpenPrice,VX1LowPrice,VX
                   TradeVX1Actual, TradeVX2Target, TradeVX2Contracts, TradeVX2Actual, PortfolioCash, PortfolioMktValPre, PortfolioNetLiqPre, PortfolioMktValPost, PortfolioNetLiqPost, PositionVX1Pre, ...
                   PositionVX1Post, PortfolioVX1ContractsPre, PortfolioVX1ContractsPost, PositionVX2Pre, PositionVX2Post, PortfolioVX2ContractsPre, PortfolioVX2ContractsPost, ExposureVX1Pre, ExposureVX1Post, ExposureVX2Pre, ...
                   ExposureVX2Post, DailyPL, DailyROR, CummPL, CummROR,CummSharpeRatio, ...
-                  TradeVX1TargetMonday,TradeVX2TargetMonday,PortfolioCashMonday,TradeVX1ActualMonday, ...
+                  TradeVX1TargetMonday,TradeVX2TargetMonday,TradeVX1ActualMonday, ...
                   TradeVX2ActualMonday,VIX,CONTANGO,CONTANGO30,ROLL_YIELD];
               
 TotalPortfolio = [InitialValues; TotalPortfolio];
 TotalPortfolio = num2cell(TotalPortfolio);
 TotalPortfolio = cat(1,PortfolioLabels, TotalPortfolio);
-TnP = TotalPortfolio;
+%TnP = TotalPortfolio;
 
 stoplosscount = num2str(stoplosscount);
 disp('Number of stop losses activated')
 disp(stoplosscount)
 
-end
+TnP = TotalPortfolio;
 
+
+save('Volatility_TradesPerformance');
+
+end
 

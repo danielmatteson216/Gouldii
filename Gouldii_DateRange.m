@@ -1,4 +1,4 @@
-%load('Volatility_Parameters.mat');
+load('Volatility_Parameters.mat');
 
         TradeNum = datenum(TradeDate);
         DateString = datestr(TradeDate,'MM/dd/yyyy');        
