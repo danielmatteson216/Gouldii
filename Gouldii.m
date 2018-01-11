@@ -498,9 +498,10 @@ OptimizedParameter1String = get(OptimizedParameter1Button, 'String');
 OptimizedParameter2Button = get(handles.radiopanel2,'SelectedObject');
 OptimizedParameter2String = get(OptimizedParameter2Button, 'String');
 
-status_start = 'initialized';
-status_run = 'running';
-status_end = 'finished';
+status_error = 'Error Occurred - Check Dates';
+status_start = 'Initialized';
+status_run = 'Running';
+status_end = 'Finished';
 set(handles.status_GUI,'String',status_run);
 drawnow;
 
@@ -521,12 +522,48 @@ opt2lowerbound = str2num(opt2lowerbound);
 opt2upperbound = str2num(opt2upperbound);
 
 
-startdate_string = get(handles.Input_StartDate,'String');
-enddate_string = get(handles.Input_EndDate,'String');
-stoploss_string = get(handles.Input_Stoploss,'String');
+%----------------------------------------------------
+% deal with the dates!!!
 
-Serial_startdate = datenum(startdate_string,'mm/dd/yyyy');
-Serial_enddate = datenum(enddate_string,'mm/dd/yyyy');
+         startdate_string = get(handles.Input_StartDate,'String');
+         enddate_string = get(handles.Input_EndDate,'String');
+         
+         if strcmp (startdate_string, 'MM/DD/YYYY') || strcmp (enddate_string , 'MM/DD/YYYY')
+             set(handles.status_GUI,'String',status_error);
+             warning('you must enter a valid trading date in the correct format. Check to ensure that the date entered is not a weekend or holiday'); 
+             pause(2)
+             clc
+             set(handles.status_GUI,'String',status_start);
+         return;
+         end
+         
+         Serial_startdate = datenum(startdate_string,'mm/dd/yyyy');
+         Serial_enddate = datenum(enddate_string,'mm/dd/yyyy');
+         
+         datecheck = 1; beginningdate = '08/27/2006'; finaldate = '12/27/2017';
+         
+         if Serial_startdate < datenum(beginningdate,'mm/dd/yyyy');
+         datecheck = 0;
+         end
+         if Serial_enddate > datenum(finaldate,'mm/dd/yyyy');
+         datecheck = 0;
+         end
+         
+        ProperDates = isbusday(startdate_string) && isbusday(enddate_string) && datecheck == 1 ;
+
+          if ProperDates == 0
+             set(handles.status_GUI,'String',status_error);
+             warning('you must enter a valid trading date in the correct format. Check to ensure that the date entered is not a weekend or holiday'); 
+             pause(2)
+             clc
+             set(handles.status_GUI,'String',status_start);
+             return;
+             
+          end        
+
+%----------------------------------------------------
+
+stoploss_string = get(handles.Input_Stoploss,'String');
 StopLoss = str2num(stoploss_string);
 
 ContangoEntry = get(handles.Input_ContangoEntry,'String');
@@ -543,10 +580,49 @@ Contango30Exit = str2num(Contango30Exit);
 LongContangoEntry = str2num(LongContangoEntry);
 LongContango30Entry = str2num(LongContango30Entry);
 
-%show code is running
-pause(6)
-% -------------
+%what inputs do we have here?
+%OptimizedParameter1String
+%OptimizedParameter2String
 
+%opt1numofsteps
+%opt1lowerbound
+%opt1upperbound
+
+%opt2numofsteps
+%opt2lowerbound
+%opt2upperbound
+
+%Serial_startdate
+%Serial_enddate
+%StopLoss
+
+%ContangoEntry 
+%Contango30Entry
+%ContangoExit 
+%Contango30Exit
+%LongContangoEntry
+%LongContango30Entry
+
+%call the LO code here
+%try
+[OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry] = Gouldii_SignalsLinearOptimizer(StopLoss,Serial_startdate,Serial_enddate,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry);
+%catch
+% fprintf('Error in code');   
+%end
+
+%OptContangoEntry
+%OptContango30Entry
+%OptContangoExit
+%OptContango30Exit
+%OptLongContangoEntry
+%OptLongContango30Entry
+            set(handles.Input_ContangoEntry, 'string', OptContangoEntry) 
+            set(handles.Input_Contango30Entry, 'string', OptContango30Entry)         
+            set(handles.Input_ContangoExit, 'string', OptContangoExit)       
+            set(handles.Input_Contango30Exit, 'string', OptContango30Exit)       
+            set(handles.Input_LongContangoEntry, 'string', OptLongContangoEntry)    
+            set(handles.Input_LongContango30Entry,'string', OptLongContango30Entry) 
+            %set(handles.input_Contango30Entry, 'string', '0.10') 
 set(handles.status_GUI,'String',status_end);
 pause(5)
 set(handles.status_GUI,'String',status_start);

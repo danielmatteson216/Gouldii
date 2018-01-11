@@ -1,17 +1,18 @@
-function Gouldii_SignalsLinearOptimizer(Serial_startdate,Serial_enddate,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry)
+function [OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,Contango30Entry] = Gouldii_SignalsLinearOptimizer(StopLoss,Serial_startdate,Serial_enddate,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry)
 
 %clear; close all; clc
 
 %set input argument default values if they are not passed to the function
 if nargin == 0
+StopLoss = 0.1;
 Serial_startdate = 732910;
 Serial_enddate = 737029;
 OptimizedParameter1String = 'ContangoEntry';
-opt1numofsteps = 2;
+opt1numofsteps = 1;
 opt1lowerbound = 0.07;
 opt1upperbound = 0.09;
 OptimizedParameter2String = 'ContangoExit';
-opt2numofsteps = 2;
+opt2numofsteps = 1;
 opt2lowerbound = 0.03;
 opt2upperbound = 0.04;
 ContangoEntry = 0.088;
@@ -37,8 +38,10 @@ SERIAL_DATE_LEN = length(SERIAL_DATE_DATA);
 TradeDate_String = datestr(SERIAL_DATE_DATA, 'yyyymmdd');
 TradeDate_cellarray = cellstr(TradeDate_String);
 
+
 % Stop loss percentage
-stoploss = .10;
+%stoploss = .10;
+stoploss = StopLoss;
 
 %optimize the contango entry variable...
 % stepsize
@@ -79,19 +82,10 @@ OptParam2Cell = OptParam2Cell';
 
 Serial_startdate = datefind(Serial_startdate,SERIAL_DATE_DATA);
 Serial_enddate = datefind(Serial_enddate,SERIAL_DATE_DATA);
-TargetWeightVX1 = TargetWeightVX1(Serial_startdate:Serial_enddate, :);                             
-TargetWeightVX2 = TargetWeightVX2(Serial_startdate:Serial_enddate, :);
-SERIAL_DATE_DATA = SERIAL_DATE_DATA(Serial_startdate:Serial_enddate, :);
-VIX = VIX(Serial_startdate:Serial_enddate, :);
-TradeDate = TradeDate(Serial_startdate:Serial_enddate, :);
-TradeDay = TradeDay(Serial_startdate:Serial_enddate, :);
-TradeDate_NumFormat = TradeDate_NumFormat(Serial_startdate:Serial_enddate, :);
-T1 = T1(Serial_startdate:Serial_enddate, :);
-T2 = T2(Serial_startdate:Serial_enddate, :);
-CONTANGO = CONTANGO(Serial_startdate:Serial_enddate, :);
-CONTANGO30 = CONTANGO30(Serial_startdate:Serial_enddate, :);
-ROLL_YIELD = ROLL_YIELD(Serial_startdate:Serial_enddate, :);
 
+
+
+ 
 %initialize flags
 %flag_future = 1;
  j = 1;
@@ -156,8 +150,7 @@ end
     sigvec(:,j,m) = sig;
     %Call the trades and performance function...  
 
-    %finaloutput = Gouldii_TradesPerformanceFunctionGUI(VIX, sig, SERIAL_DATE_DATA, TargetWeightVX1, TargetWeightVX2, TradeDate, ExpDates, ContractExpirations, ContractsAsStructure_RowsAsDates,TradeDate_NumFormat,T1,T2,stoploss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD);
-finaloutput = Gouldii_TradesPerformanceFunction(Serial_enddate,Serial_startdate,VIX, sig, SERIAL_DATE_DATA, TargetWeightVX1, TargetWeightVX2, TradeDate, ExpDates, ContractExpirations, ContractsAsStructure_RowsAsDates,TradeDate_NumFormat,T1,T2,stoploss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD);
+    finaloutput = Gouldii_TradesPerformanceFunction(Serial_enddate,Serial_startdate,VIX, sig, SERIAL_DATE_DATA, TargetWeightVX1, TargetWeightVX2, TradeDate, ExpDates, ContractExpirations, ContractsAsStructure_RowsAsDates,TradeDate_NumFormat,T1,T2,stoploss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD);
 
    
     OUTPUT_CELL_ARRAY{j} = finaloutput;
@@ -204,6 +197,7 @@ finaloutput = Gouldii_TradesPerformanceFunction(Serial_enddate,Serial_startdate,
  end   %end of linear opt loop!!!
  
  if  strcmp(OptimizedParameter1String,OptimizedParameter2String)
+ LinearOpt3Results = LinearOptResults;
  break;
  end
  
@@ -276,7 +270,7 @@ xlswrite('LinearOpt3Results.xlsx',TotalLinearOpt);
 
 load('Volatility_BuyAndHold.mat'); 
 
-
+TotalLinearOpt
 
 %TradeDates = datetime(SERIAL_DATE_DATA,'ConvertFrom','datenum');
 %figure(100)

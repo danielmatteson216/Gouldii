@@ -1,4 +1,4 @@
-function TnP = Gouldii_TradesPerformanceFunctionGUI(Serial_enddate,Serial_startdate,VIX, sig, SERIAL_DATE_DATA, TargetWeightVX1, TargetWeightVX2, TradeDate, ExpDates, ContractExpirations, ContractsAsStructure_RowsAsDates,TradeDate_NumFormat,T1,T2,stoploss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD);
+function TnP = Gouldii_TradesPerformanceFunction(Serial_enddate,Serial_startdate,VIX, sig, SERIAL_DATE_DATA, TargetWeightVX1, TargetWeightVX2, TradeDate, ExpDates, ContractExpirations, ContractsAsStructure_RowsAsDates,TradeDate_NumFormat,T1,T2,stoploss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD);
 
 %[nr,nc] = size(SERIAL_DATE_DATA);
 nr = Serial_enddate - Serial_startdate+1; 
@@ -7,9 +7,23 @@ nc = 1;
 %nr = nr + 1;
 Commish = .001;
 
+Temp_TargetWeightVX1 = TargetWeightVX1(Serial_startdate:Serial_enddate);
+Temp_TargetWeightVX2 = TargetWeightVX2(Serial_startdate:Serial_enddate);
+Temp_T1 = T1(Serial_startdate:Serial_enddate, :);
+Temp_T2 = T2(Serial_startdate:Serial_enddate, :);
+Temp_CONTANGO = CONTANGO(Serial_startdate:Serial_enddate, :);
+Temp_CONTANGO30 = CONTANGO30(Serial_startdate:Serial_enddate, :);
+Temp_ROLL_YIELD = ROLL_YIELD(Serial_startdate:Serial_enddate, :);
+Temp_ContractExpirations = ContractExpirations(Serial_startdate:Serial_enddate, :);
+Temp_SERIAL_DATE_DATA = SERIAL_DATE_DATA(Serial_startdate:Serial_enddate, :);
+Temp_VIX = VIX(Serial_startdate:Serial_enddate, :);
+Temp_TradeDate = TradeDate(Serial_startdate:Serial_enddate, :);
+Temp_TradeDay = TradeDay(Serial_startdate:Serial_enddate, :);
+Temp_TradeDate_NumFormat = TradeDate_NumFormat(Serial_startdate:Serial_enddate, :);
+    
 Exposure = sig * 100;
-TargetWeightVX1postsig = TargetWeightVX1 .* sig;
-TargetWeightVX2postsig = TargetWeightVX2 .* sig;
+TargetWeightVX1postsig = Temp_TargetWeightVX1 .* sig;
+TargetWeightVX2postsig = Temp_TargetWeightVX2 .* sig;
 
 PortfolioCash = zeros(nr,nc);
 
@@ -93,9 +107,12 @@ for i = 1:nr
       %     TargetWeightVX1postsig(i) = 0;
       %     TargetWeightVX2postsig(i) = 0;
       % end
-       
+     
+      %need to figure out which fucking contracts are considered VX1 and
+      %VX2 based on the start date!!!
      ContractUnderTest1 = char(ContractExpirations(i,1));
      ContractUnderTest2 = char(ContractExpirations(i,2));
+     
      DateUnderTest = char(TradeDate(i,1));
      ColumnUnderTestOpen = 'Open';
      ColumnUnderTest = 'Close';
@@ -234,8 +251,14 @@ for i = 1:nr
            frisig_vx1(i,1) = 0;
            frisig_vx2(i,1) = 0;
            
+           if TradeDay(i) == 2
            TradeVX1TargetMonday(i,1) = 0;
            TradeVX2TargetMonday(i,1) = 0;
+           TradeVX1ActualMonday(i,1) = 0;
+           TradeVX2ActualMonday(i,1) = 0;
+           TradeVX1ContractsMonday(i,1) = 0;
+           TradeVX2ContractsMonday(i,1) = 0;  
+           end
  % -----------------------------------------------------------------------
            % DAY 2 --> "today"
         elseif i > 1          
@@ -245,8 +268,9 @@ for i = 1:nr
                 PortfolioVX1ContractsPre(i,1) = PortfolioVX2ContractsPost(i-1,1);
                 PortfolioVX2ContractsPre(i,1) = 0;  
                 PortfolioCashPre(i,1) = PortfolioCash(i-1,1);
-                
-            elseif TradeDay(i) == 2 % this happens on monday            
+            end
+            
+            if TradeDay(i) == 2 % this happens on monday            
                 TradeVX1TargetMonday(i,1) = frisig_vx1(i-1,1) * PortfolioNetLiqPost(i-1,1); 
                 TradeVX2TargetMonday(i,1) = frisig_vx2(i-1,1) * PortfolioNetLiqPost(i-1,1); 
                 TradeVX1ContractsMonday(i,1) = round(TradeVX1TargetMonday(i,1) / (Asset1OpenPrice*1000));
@@ -403,13 +427,13 @@ InitialValues = [0,0,0,0,0,0,0,0,0,0, ...
                  0,0,0, ...
                  0,0,0,0,0];
 
-TotalPortfolio = [TradeDate_NumFormat,TradeDay,T1,T2,VX1OpenPrice,VX1LowPrice,VX1Price,VX1HighPrice,VX2OpenPrice,VX2LowPrice, ...
-                  VX2Price,VX2HighPrice, TargetWeightVX1, TargetWeightVX2, sig, stoplossTrigger, TargetWeightVX1postsig, TargetWeightVX2postsig, TradeVX1Target, TradeVX1Contracts, ...
+TotalPortfolio = [Temp_TradeDate_NumFormat,Temp_TradeDay,Temp_T1,Temp_T2,VX1OpenPrice,VX1LowPrice,VX1Price,VX1HighPrice,VX2OpenPrice,VX2LowPrice, ...
+                  VX2Price,VX2HighPrice, Temp_TargetWeightVX1, Temp_TargetWeightVX2, sig, stoplossTrigger, TargetWeightVX1postsig, TargetWeightVX2postsig, TradeVX1Target, TradeVX1Contracts, ...
                   TradeVX1Actual, TradeVX2Target, TradeVX2Contracts, TradeVX2Actual, PortfolioCash, PortfolioMktValPre, PortfolioNetLiqPre, PortfolioMktValPost, PortfolioNetLiqPost, PositionVX1Pre, ...
                   PositionVX1Post, PortfolioVX1ContractsPre, PortfolioVX1ContractsPost, PositionVX2Pre, PositionVX2Post, PortfolioVX2ContractsPre, PortfolioVX2ContractsPost, ExposureVX1Pre, ExposureVX1Post, ExposureVX2Pre, ...
                   ExposureVX2Post, DailyPL, DailyROR, CummPL, CummROR,CummSharpeRatio, ...
                   TradeVX1TargetMonday,TradeVX2TargetMonday,TradeVX1ActualMonday, ...
-                  TradeVX2ActualMonday,VIX,CONTANGO,CONTANGO30,ROLL_YIELD];
+                  TradeVX2ActualMonday,Temp_VIX,Temp_CONTANGO,Temp_CONTANGO30,Temp_ROLL_YIELD];
               
 TotalPortfolio = [InitialValues; TotalPortfolio];
 TotalPortfolio = num2cell(TotalPortfolio);

@@ -3,31 +3,32 @@ function [sig,Exists_ContangoEntry,Exists_Contango30Entry,Exists_ContangoExit,Ex
 
     % start of strategy
    % for i = 1:length(SERIAL_DATE_DATA)
+   counter = 1;
      for i = Serial_startdate:Serial_enddate
-        if i == 1 
-            sig(i,1) = 0;
+        if i == Serial_startdate 
+            sig(counter,1) = 0;
       
-        elseif i > 1  
+        elseif i > Serial_startdate  
             
 %            [sig] = 
             
-            if (CONTANGO(i) > ContangoEntry && CONTANGO30(i) > Contango30Entry && sig(i-1,1) == 0) 
-                sig(i,1) = -1;
-           
-            elseif (CONTANGO(i) > ContangoExit && CONTANGO30(i) > Contango30Exit && sig(i-1,1) < 0) % 
-                sig(i,1) = -1;
-
-            elseif (CONTANGO(i) < LongContangoEntry && CONTANGO30(i) < LongContango30Entry) 
-                sig(i,1) = 0;
+            if (CONTANGO(i) > ContangoEntry && CONTANGO30(i) > Contango30Entry && sig(counter-1,1) == 0) 
+                sig(counter,1) = -1;
                 
+            elseif (CONTANGO(i) > ContangoExit && CONTANGO30(i) > Contango30Exit && sig(counter-1,1) < 0) % 
+                sig(counter,1) = -1;
+                %counter = counter+1;
+            elseif (CONTANGO(i) < LongContangoEntry && CONTANGO30(i) < LongContango30Entry) 
+                sig(counter,1) = 0;
+                %counter = counter+1;
             else 
-                sig(i,1) = 0;                
-        
+                sig(counter,1) = 0;                
+                %counter = counter+1;
             end 
 
         end
 
- 
+ counter = counter+1;
     end % end of strategy
     
     
