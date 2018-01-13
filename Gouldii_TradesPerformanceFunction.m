@@ -1,11 +1,10 @@
-function TnP = Gouldii_TradesPerformanceFunction(initialportfolio,Serial_enddate,Serial_startdate,VIX, sig, SERIAL_DATE_DATA, TargetWeightVX1, TargetWeightVX2, TradeDate, ExpDates, ContractExpirations, ContractsAsStructure_RowsAsDates,TradeDate_NumFormat,T1,T2,stoploss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD)
+function TnP = Gouldii_TradesPerformanceFunction(Commission,initialportfolio,Serial_enddate,Serial_startdate,VIX, sig, SERIAL_DATE_DATA, TargetWeightVX1, TargetWeightVX2, TradeDate, ExpDates, ContractExpirations, ContractsAsStructure_RowsAsDates,TradeDate_NumFormat,T1,T2,stoploss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD)
 
 %[nr,nc] = size(SERIAL_DATE_DATA);
 nr = Serial_enddate - Serial_startdate+1; 
 nc = 1;
 
 %nr = nr + 1;
-Commish = .001;
 
 Temp_TargetWeightVX1 = TargetWeightVX1(Serial_startdate:Serial_enddate);
 Temp_TargetWeightVX2 = TargetWeightVX2(Serial_startdate:Serial_enddate);
@@ -204,7 +203,7 @@ for i = 1:nr
   %XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   %                  The decision making shit happens here!
   %DAY ONE
-        if i == 1
+        if i == 1              
            
            PositionVX1Pre(i,1) = (PositionVX1ContractsInitial * Asset1ClosePrice * 1000);
            PositionVX2Pre(i,1) = (PositionVX2ContractsInitial * Asset2ClosePrice * 1000);
@@ -269,8 +268,9 @@ for i = 1:nr
                 PortfolioVX1ContractsPre(i,1) = PortfolioVX2ContractsPost(i-1,1);
                 PortfolioVX2ContractsPre(i,1) = 0;  
                 PortfolioCashPre(i,1) = PortfolioCash(i-1,1);
+          
             
-            elseif Temp_TradeDay(i) == 2 % this happens on monday            
+        elseif Temp_TradeDay(i) == 2 % this happens on monday            
                 TradeVX1TargetMonday(i,1) = frisig_vx1(i-1,1) * PortfolioNetLiqPost(i-1,1); 
                 TradeVX2TargetMonday(i,1) = frisig_vx2(i-1,1) * PortfolioNetLiqPost(i-1,1); 
                 TradeVX1ContractsMonday(i,1) = round(TradeVX1TargetMonday(i,1) / (Asset1OpenPrice*1000));
@@ -371,15 +371,15 @@ for i = 1:nr
                                     end
 
                                     if TradeVX1Contracts(i,1) <= 0
-                                       TradeVX1Actual(i,1) = (Asset1ClosePrice - .035) * 1000 * TradeVX1Contracts(i,1);
+                                       TradeVX1Actual(i,1) = ((Asset1ClosePrice - .035) * 1000 * TradeVX1Contracts(i,1))*(1-Commission);
                                     elseif TradeVX1Contracts(i,1) > 0
-                                       TradeVX1Actual(i,1) = (Asset1ClosePrice + .035) * 1000 * TradeVX1Contracts(i,1);
+                                       TradeVX1Actual(i,1) = ((Asset1ClosePrice + .035) * 1000 * TradeVX1Contracts(i,1))*(1+Commission);
                                    end 
                                     
                                     if TradeVX2Contracts(i,1) <= 0
-                                       TradeVX2Actual(i,1) = (Asset2ClosePrice - .035) * 1000 * TradeVX2Contracts(i,1);                                        
+                                       TradeVX2Actual(i,1) = ((Asset2ClosePrice - .035) * 1000 * TradeVX2Contracts(i,1))*(1-Commission);                                        
                                     elseif TradeVX2Contracts(i,1) > 0
-                                       TradeVX2Actual(i,1) = (Asset2ClosePrice + .035) * 1000 * TradeVX2Contracts(i,1);                                        
+                                       TradeVX2Actual(i,1) = ((Asset2ClosePrice + .035) * 1000 * TradeVX2Contracts(i,1))*(1+Commission);                                        
                                     end 
                                    
                            PortfolioCash(i,1) = (PortfolioCashPre(i,1) - TradeVX1Actual(i,1) - TradeVX2Actual(i,1));    

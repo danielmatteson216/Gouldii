@@ -22,7 +22,7 @@ function varargout = Gouldii(varargin)
 
 % Edit the above text to modify the response to help Gouldii
 
-% Last Modified by GUIDE v2.5 12-Jan-2018 13:00:12
+% Last Modified by GUIDE v2.5 12-Jan-2018 18:38:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1015,6 +1015,9 @@ StopLoss = str2num(stoploss_string);
 initialportfolio_string = get(handles.Input_InitialPortfolio,'String');
 initialportfolio = str2num(initialportfolio_string);
 
+Commission_string = get(handles.Input_Commission,'String');
+Commission = str2num(Commission_string);
+
 ContangoEntry = get(handles.Input_ContangoEntry,'String');
 Contango30Entry = get(handles.Input_Contango30Entry,'String');
 ContangoExit = get(handles.Input_ContangoExit,'String');
@@ -1066,7 +1069,7 @@ end
 %call the LO code here
 
 %try
-[OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn] = Gouldii_SignalsLinearOptimizer(StrategyPath, SelectedStrategy, initialportfolio, StopLoss,Serial_startdate,Serial_enddate,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry);
+[OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn] = Gouldii_SignalsLinearOptimizer(StrategyPath, SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate,Serial_enddate,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry);
 %catch
 % fprintf('Error in code');   
 %end
@@ -1132,3 +1135,28 @@ set(handles.Static_Strategy,'String',SelectedStrategy);
 set(handles.Static_StrategyPath,'String',StrategyPath);
 
 guidata(hObject, handles);
+
+
+
+function Input_Commission_Callback(hObject, eventdata, handles)
+% hObject    handle to Input_Commission (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Input_Commission as text
+%        str2double(get(hObject,'String')) returns contents of Input_Commission as a double
+input = get(hObject,'String');
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function Input_Commission_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Input_Commission (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
