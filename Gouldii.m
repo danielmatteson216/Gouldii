@@ -1056,15 +1056,15 @@ pause(2)
 set(handles.status_GUI,'String',status_start);
 end
 
-%StrategyIsEmpty = exist('StrategyPath');
-%if StrategyIsEmpty == 0
-%StrategyPath = 'default';
-%SelectedStrategy = 'Gouldii_Strategy_Prime.m';
-%else
+StrategyIsEmpty = exist('StrategyPath');
+if StrategyIsEmpty == 0
+StrategyPath = 'default';
+SelectedStrategy = 'Gouldii_Strategy_Prime.m';
+else
 StrategyPath = handles.StrategyPath;
 SelectedStrategy = handles.SelectedStrategy;
    
-%end    
+end    
 
 %call the LO code here
 
@@ -1124,7 +1124,8 @@ function Strategy_button_Callback(hObject, eventdata, handles)
 % hObject    handle to Strategy_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[FileName,PathName] = uigetfile('*.m','Select a strategy');
+%[FileName,PathName] = uigetfile('*.m','Select a strategy');
+[FileName,PathName] = uigetfile(fullfile(pwd,'Strategies','Select a strategy'));
 SelectedStrategy = FileName;
 StrategyPath = PathName;
 

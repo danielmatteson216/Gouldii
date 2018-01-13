@@ -3,6 +3,7 @@ function [OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,
 
 
 addpath('Strategies');
+addpath('trunk');
 
 %clear; close all; clc
 
