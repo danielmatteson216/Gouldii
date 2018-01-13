@@ -926,6 +926,8 @@ OptimizedParameter1String = get(OptimizedParameter1Button, 'String');
 OptimizedParameter2Button = get(handles.radiopanel2,'SelectedObject');
 OptimizedParameter2String = get(OptimizedParameter2Button, 'String');
 
+status_error3 = 'Setting default parameters';
+status_error2 = 'Setting default dates';
 status_error = 'Error Occurred - Check Dates';
 status_start = 'Initialized';
 status_run = 'Running';
@@ -965,12 +967,18 @@ opt2upperbound = str2num(opt2upperbound);
          if strcmp (startdate_string, 'MM/DD/YYYY') || strcmp (enddate_string , 'MM/DD/YYYY')
              set(handles.status_GUI,'String',status_error);
              warning('you must enter a valid trading date in the correct format. Check to ensure that the date entered is not a weekend or holiday'); 
-             pause(3)
+             pause(2)
+             set(handles.status_GUI,'String',status_error2);
+             set(handles.Input_StartDate,'String', '08/21/2006');
+             set(handles.Input_EndDate,'String', '12/27/2017');             
+             pause(2)
              clc
              set(handles.OutputTextBox,'String', '');
              set(handles.status_GUI,'String',status_start);
              drawnow;
-         return;
+             startdate_string = '08/21/2006';
+             enddate_string = '12/27/2017';
+         %return;
          end
          
          Serial_startdate = datenum(startdate_string,'mm/dd/yyyy');
@@ -1021,34 +1029,41 @@ Contango30Exit = str2num(Contango30Exit);
 LongContangoEntry = str2num(LongContangoEntry);
 LongContango30Entry = str2num(LongContango30Entry);
 
-%what inputs do we have here?
-%OptimizedParameter1String
-%OptimizedParameter2String
+if ContangoEntry == 0 && Contango30Entry == 0 && ContangoExit == 0 && Contango30Exit == 0 && LongContangoEntry == 0 && LongContango30Entry == 0
 
-%opt1numofsteps
-%opt1lowerbound
-%opt1upperbound
+    
+ContangoEntry = 0.08;
+Contango30Entry = 0.1;
+ContangoExit = 0.035;
+Contango30Exit = 0.1;
+LongContangoEntry = -0.05;
+LongContango30Entry = 0;
 
-%opt2numofsteps
-%opt2lowerbound
-%opt2upperbound
+set(handles.status_GUI,'String',status_error3);
+             
+set(handles.Input_ContangoEntry,'String',ContangoEntry);
+set(handles.Input_Contango30Entry,'String',Contango30Entry);
+set(handles.Input_ContangoExit,'String',ContangoExit);
+set(handles.Input_Contango30Exit,'String',Contango30Exit);
+set(handles.Input_LongContangoEntry,'String',LongContangoEntry);
+set(handles.Input_LongContango30Entry,'String',LongContango30Entry);
 
-%Serial_startdate
-%Serial_enddate
-%StopLoss
+pause(2)
 
-%ContangoEntry 
-%Contango30Entry
-%ContangoExit 
-%Contango30Exit
-%LongContangoEntry
-%LongContango30Entry
-%handles.Input_ContangoEntry,'String');
+set(handles.status_GUI,'String',status_start);
+end
+
+StrategyIsEmpty = exist('StrategyPath');
+if StrategyIsEmpty == 0
+StrategyPath = 'default';
+SelectedStrategy = 'Gouldii_Strategy_Prime.m';
+else
 StrategyPath = handles.StrategyPath;
 SelectedStrategy = handles.SelectedStrategy;
+   
+end    
 
 %call the LO code here
-
 
 %try
 [OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn] = Gouldii_SignalsLinearOptimizer(StrategyPath, SelectedStrategy, initialportfolio, StopLoss,Serial_startdate,Serial_enddate,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry);
