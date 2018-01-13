@@ -3,7 +3,7 @@ function [OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,
 
 
 addpath('Strategies');
-addpath('trunk');
+
 
 %clear; close all; clc
 
@@ -86,7 +86,7 @@ OptParam2Cell = OptParam2Cell';
 
 Serial_startdate = datefind(Serial_startdate,SERIAL_DATE_DATA);
 Serial_enddate = datefind(Serial_enddate,SERIAL_DATE_DATA);
-
+Temp_SERIAL_DATE_DATA = SERIAL_DATE_DATA(Serial_startdate:Serial_enddate, :);
 
 
  
@@ -204,7 +204,7 @@ for j = 1:length(OptimizedParameter1)
        LinearOptResults(j,7) = num2cell(MaxDD(j,1));
        LinearOptResults(j,8) = num2cell(NetProfit(1,j));
        LinearOptResults(j,9) = SharpeRatio(1,j);
-       LinearOptResults(j,10) = num2cell(((1+CummROR(1,j))^(365/length(SERIAL_DATE_DATA)))-1);
+       LinearOptResults(j,10) = num2cell(((1+CummROR(1,j))^(365/length(Temp_SERIAL_DATE_DATA)))-1);
       %LinearOptResults(j,10) = num2cell(MaxDDindex(1,j));
       
       
@@ -240,13 +240,14 @@ clear('emptycell68','XIVindexstop','TradeDate_cellarray','TradeDate_String','XIV
 %xlswrite('COMPLETE_OUTPUT_ARRAY.xlsx',COMPLETE_OUTPUT_ARRAY);
 %xlswrite('TOTAL_OUTPUT_ARRAY.xlsx',TOTAL_OUTPUT_ARRAY);
 %xlswrite('LinearOptResults.xlsx',LinearOpt3Results);
-xlswrite('VixLinearOptResults.xlsx',finaloutput);
-xlswrite('MaxDrawdowntotal.xlsx',MaxDrawdowntotal);
+
+%xlswrite('VixLinearOptResults.xlsx',finaloutput);
+%xlswrite('MaxDrawdowntotal.xlsx',MaxDrawdowntotal);
 
        %remove the initial value row from the net liq output array
 NetLiqTotalMatrix = NetLiqTotalMatrix(2:end,:);
 
-save('Volatility_Signals_linearopt_GUItest');
+
 
 
 % this is the objective function portion!!!!
@@ -272,38 +273,38 @@ TotalLinearOpt3 = [LinearOpt3Results(1:end,1),LinearOpt3Results(1:end,2),LinearO
               
 TotalLinearOpt = cat(1,LinearOpt3Labels, TotalLinearOpt3);
 
-xlswrite('LinearOpt3Results.xlsx',TotalLinearOpt);
+%xlswrite('LinearOpt3Results.xlsx',TotalLinearOpt);
 
 
  %func_output = finaloutput;
-%NetLiqOptimized(:,1) = NetLiqTotalMatrix(:,MaxSharpeIndex); 
+NetLiqOptimized(:,1) = NetLiqTotalMatrix(:,MaxSharpeIndex); 
 %NetLiqOptimizedRow = NetLiqOptimized';
 
 %xlswrite('OptimizedNetLiqTotal.xlsx',NetLiqOptimizedRow,'append');
 
 %NetLiqOptimizedTotal = NetLiqOptimized(:,i);
 
-%load('Volatility_BuyAndHold.mat'); 
+load('Volatility_BuyAndHold.mat'); 
 
 
-
+save('Volatility_Signals_linearopt_GUItest')
 
 TotalLinearOpt
 
+NetLiqTotalBuyAndHold = NetLiqTotalBuyAndHold(Serial_startdate:Serial_enddate, :);
 
+NetLiqTotalBuyAndHold_Returns = tick2ret(NetLiqTotalBuyAndHold);
+NetLiqTotalBuyAndHold_Scaled = ret2price(NetLiqTotalBuyAndHold_Returns,initialportfolio);
 
-
-%TradeDates = datetime(SERIAL_DATE_DATA,'ConvertFrom','datenum');
-%figure(100)
-%plot(TradeDates,NetLiqTotalBuyAndHold)
-%FromDate = datefind(7322,TradeDates);
-%ToDate = datefind('06/30/2014',TradeDates);
+TradeDates = datetime(Temp_SERIAL_DATE_DATA,'ConvertFrom','datenum');
+figure(100)
+plot(TradeDates,NetLiqTotalBuyAndHold_Scaled)
 
         %create title with all params values (optimized will change!!!) maybe add
-%hold on
-%plot(TradeDates,NetLiqOptimized)
+hold on
+plot(TradeDates,NetLiqOptimized)
 %axis([FromDate ToDate])
-%set(gca,'YScale','log')
+set(gca,'YScale','log')
 %figure(101)
 
 %plot(TradeDates,CONTANGO)
