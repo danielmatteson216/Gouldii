@@ -1056,15 +1056,15 @@ pause(2)
 set(handles.status_GUI,'String',status_start);
 end
 
-StrategyIsEmpty = exist('StrategyPath');
-if StrategyIsEmpty == 0
-StrategyPath = 'default';
-SelectedStrategy = 'Gouldii_Strategy_Prime.m';
-else
+%StrategyIsEmpty = exist('StrategyPath');
+%if StrategyIsEmpty == 0
+%StrategyPath = 'default';
+%SelectedStrategy = 'Gouldii_Strategy_Prime.m';
+%else
 StrategyPath = handles.StrategyPath;
 SelectedStrategy = handles.SelectedStrategy;
    
-end    
+%end    
 
 %call the LO code here
 
