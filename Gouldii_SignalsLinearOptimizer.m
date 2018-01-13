@@ -241,8 +241,8 @@ clear('emptycell68','XIVindexstop','TradeDate_cellarray','TradeDate_String','XIV
 %xlswrite('TOTAL_OUTPUT_ARRAY.xlsx',TOTAL_OUTPUT_ARRAY);
 %xlswrite('LinearOptResults.xlsx',LinearOpt3Results);
 
-%xlswrite('VixLinearOptResults.xlsx',finaloutput);
-%xlswrite('MaxDrawdowntotal.xlsx',MaxDrawdowntotal);
+xlswrite('OptResultsOutputArray.xlsx',finaloutput);
+xlswrite('MaxDrawdowntotal.xlsx',MaxDrawdowntotal);
 
        %remove the initial value row from the net liq output array
 NetLiqTotalMatrix = NetLiqTotalMatrix(2:end,:);
@@ -273,7 +273,7 @@ TotalLinearOpt3 = [LinearOpt3Results(1:end,1),LinearOpt3Results(1:end,2),LinearO
               
 TotalLinearOpt = cat(1,LinearOpt3Labels, TotalLinearOpt3);
 
-%xlswrite('LinearOpt3Results.xlsx',TotalLinearOpt);
+xlswrite('LinearOptResults.xlsx',TotalLinearOpt);
 
 
  %func_output = finaloutput;

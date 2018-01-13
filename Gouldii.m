@@ -659,6 +659,9 @@ function radiopanel1_SelectionChangedFcn(hObject, eventdata, handles)
 OptimizedParameter1Button = get(handles.radiopanel1,'SelectedObject');
 OptimizedParameter1String = get(OptimizedParameter1Button, 'String');
 
+set(handles.OptimizedParam1, 'String', OptimizedParameter1String)
+%drawnow
+
 OptimizedParameter2Button = get(handles.radiopanel2,'SelectedObject');
 OptimizedParameter2String = get(OptimizedParameter2Button, 'String');
 
@@ -791,6 +794,9 @@ OptimizedParameter1String = get(OptimizedParameter1Button, 'String');
 
 OptimizedParameter2Button = get(handles.radiopanel2,'SelectedObject');
 OptimizedParameter2String = get(OptimizedParameter2Button, 'String');
+
+set(handles.OptimizedParam2, 'String', OptimizedParameter2String)
+%drawnow
 
 if strcmp(OptimizedParameter1String,OptimizedParameter2String)
     
@@ -933,13 +939,13 @@ status_start = 'Initialized';
 status_run = 'Running';
 status_end = 'Finished';
 set(handles.status_GUI,'String',status_run);
-drawnow;
+%drawnow;
 previousrun = get(handles.OutputTextBox,'String');
 previousrun = previousrun(8:end);
 previousrun = cellstr(previousrun);
 previousrun = vertcat('Previous Run:',previousrun);
 set(handles.OutputTextBox,'String', previousrun);    
-drawnow;
+%drawnow;
 
 opt1numofsteps = get(handles.Input_opt1numofsteps,'String');
 opt1lowerbound = get(handles.Input_opt1lowerbound,'String');
@@ -975,7 +981,7 @@ opt2upperbound = str2num(opt2upperbound);
              clc
              set(handles.OutputTextBox,'String', '');
              set(handles.status_GUI,'String',status_start);
-             drawnow;
+             %drawnow;
              startdate_string = '08/21/2006';
              enddate_string = '12/27/2017';
          %return;
@@ -1002,7 +1008,7 @@ opt2upperbound = str2num(opt2upperbound);
              clc
              set(handles.status_GUI,'String',status_start);
              set(handles.OutputTextBox,'String', '');
-             drawnow;
+             %drawnow;
              return;
              
           end        
@@ -1110,7 +1116,12 @@ outputstring = {opt1output;
                 opt10output};
             
 outputstring = vertcat(resultstitle, outputstring);
-            
+
+xlswrite('LinearOptParams.xlsx',outputstring);
+
+previousrun = get(handles.OutputTextBox,'String');
+set(handles.PreviousTextbox,'String', previousrun);
+
 set(handles.OutputTextBox,'String', outputstring)             
             
             %set(handles.input_Contango30Entry, 'string', '0.10') 
