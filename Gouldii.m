@@ -1070,6 +1070,7 @@ SelectedStrategy = handles.SelectedStrategy;
 
 %try
 [OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn] = Gouldii_SignalsLinearOptimizer(StrategyPath, SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate,Serial_enddate,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry);
+
 %catch
 % fprintf('Error in code');   
 %end
