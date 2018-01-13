@@ -204,7 +204,7 @@ for i = 1:nr
   %XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   %                  The decision making shit happens here!
   %DAY ONE
-        if i == 1              
+        if i == 1
            
            PositionVX1Pre(i,1) = (PositionVX1ContractsInitial * Asset1ClosePrice * 1000);
            PositionVX2Pre(i,1) = (PositionVX2ContractsInitial * Asset2ClosePrice * 1000);
@@ -269,9 +269,8 @@ for i = 1:nr
                 PortfolioVX1ContractsPre(i,1) = PortfolioVX2ContractsPost(i-1,1);
                 PortfolioVX2ContractsPre(i,1) = 0;  
                 PortfolioCashPre(i,1) = PortfolioCash(i-1,1);
-            end
             
-            if Temp_TradeDay(i) == 2 % this happens on monday            
+            elseif Temp_TradeDay(i) == 2 % this happens on monday            
                 TradeVX1TargetMonday(i,1) = frisig_vx1(i-1,1) * PortfolioNetLiqPost(i-1,1); 
                 TradeVX2TargetMonday(i,1) = frisig_vx2(i-1,1) * PortfolioNetLiqPost(i-1,1); 
                 TradeVX1ContractsMonday(i,1) = round(TradeVX1TargetMonday(i,1) / (Asset1OpenPrice*1000));
