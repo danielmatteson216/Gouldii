@@ -1,4 +1,5 @@
-function [sig,Exists_ContangoEntry,Exists_Contango30Entry,Exists_ContangoExit,Exists_Contango30Exit,Exists_LongContangoEntry,Exists_LongContango30Entry] = Gouldii_Strategy_Prime(Serial_startdate,Serial_enddate,SERIAL_DATE_DATA,CONTANGO,CONTANGO30,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry)
+%function [sig,Exists_ContangoEntry,Exists_Contango30Entry,Exists_ContangoExit,Exists_Contango30Exit,Exists_LongContangoEntry,Exists_LongContango30Entry] = Gouldii_Strategy_Prime(Serial_startdate,Serial_enddate,CONTANGO,CONTANGO30,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry)
+ function [sig] = Gouldii_Strategy_Prime(Serial_startdate,Serial_enddate,CONTANGO,CONTANGO30,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry)
      
 
     % start of strategy
@@ -32,12 +33,12 @@ function [sig,Exists_ContangoEntry,Exists_Contango30Entry,Exists_ContangoExit,Ex
     end % end of strategy
     
     
-Exists_ContangoEntry = exist('ContangoEntry');
-Exists_Contango30Entry = exist('Contango30Entry');
-Exists_ContangoExit = exist('ContangoExit');
-Exists_Contango30Exit = exist('Contango30Exit');
-Exists_LongContangoEntry = exist('LongContangoEntry');
-Exists_LongContango30Entry = exist('LongContango30Entry');
+%Exists_ContangoEntry = exist('ContangoEntry');
+%Exists_Contango30Entry = exist('Contango30Entry');
+%Exists_ContangoExit = exist('ContangoExit');
+%Exists_Contango30Exit = exist('Contango30Exit');
+%Exists_LongContangoEntry = exist('LongContangoEntry');
+%Exists_LongContango30Entry = exist('LongContango30Entry');
 
 
 end

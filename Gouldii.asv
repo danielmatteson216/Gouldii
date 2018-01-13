@@ -1043,9 +1043,8 @@ LongContango30Entry = str2num(LongContango30Entry);
 %Contango30Exit
 %LongContangoEntry
 %LongContango30Entry
-%handles.Input_ContangoEntry,'String');
-StrategyPath = handles.StrategyPath;
-SelectedStrategy = handles.SelectedStrategy;
+
+get
 
 %call the LO code here
 
@@ -1056,7 +1055,12 @@ SelectedStrategy = handles.SelectedStrategy;
 % fprintf('Error in code');   
 %end
 
-
+%OptContangoEntry =1;
+%OptContango30Entry = 1;
+%OptContangoExit = 1;
+%OptContango30Exit=1;
+%OptLongContangoEntry=1;
+%OptLongContango30Entry=1;
             set(handles.Input_ContangoEntry, 'String', OptContangoEntry) 
             set(handles.Input_Contango30Entry, 'String', OptContango30Entry)         
             set(handles.Input_ContangoExit, 'String', OptContangoExit)       
@@ -1068,7 +1072,7 @@ SelectedStrategy = handles.SelectedStrategy;
 opt1output = sprintf('ContangoEntry = %.3f',OptContangoEntry);
 opt2output = sprintf('Contango30Entry = %.3f',OptContango30Entry);   
 opt3output = sprintf('ContangoExit = %.3f',OptContangoExit);        
-opt4output = sprintf('Contango30Exit = %.3f',OptContango30Exit);
+opt4output = sprintf('ContangoExit = %.3f',OptContango30Exit);
 opt5output = sprintf('LongContangoEntry = %.3f',OptLongContangoEntry);
 opt6output = sprintf('LongContango30Entry = %.3f',OptLongContango30Entry);
 opt7output = sprintf('MaxDD = %.3f', OptMaxDD);
@@ -1109,9 +1113,6 @@ function Strategy_button_Callback(hObject, eventdata, handles)
 [FileName,PathName] = uigetfile('*.m','Select a strategy');
 SelectedStrategy = FileName;
 StrategyPath = PathName;
-
-handles.SelectedStrategy = SelectedStrategy;
-handles.StrategyPath = StrategyPath;
 
 set(handles.Static_Strategy,'String',SelectedStrategy);
 set(handles.Static_StrategyPath,'String',StrategyPath);

@@ -1,4 +1,4 @@
-function TnP = Gouldii_TradesPerformanceFunction(Serial_enddate,Serial_startdate,VIX, sig, SERIAL_DATE_DATA, TargetWeightVX1, TargetWeightVX2, TradeDate, ExpDates, ContractExpirations, ContractsAsStructure_RowsAsDates,TradeDate_NumFormat,T1,T2,stoploss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD);
+function TnP = Gouldii_TradesPerformanceFunction(initialportfolio,Serial_enddate,Serial_startdate,VIX, sig, SERIAL_DATE_DATA, TargetWeightVX1, TargetWeightVX2, TradeDate, ExpDates, ContractExpirations, ContractsAsStructure_RowsAsDates,TradeDate_NumFormat,T1,T2,stoploss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD)
 
 %[nr,nc] = size(SERIAL_DATE_DATA);
 nr = Serial_enddate - Serial_startdate+1; 
@@ -77,7 +77,7 @@ CummSharpeRatio = zeros(nr,nc);
         
 %PortfolioCashInitial = cell2mat(PortfolioCashInitialcell);
 %PortfolioCashInitial = str2double(PortfolioCashInitial);
-PortfolioCashInitial = 1000000;
+PortfolioCashInitial = initialportfolio;
 PortfolioNetLiqInitial = PortfolioCashInitial;
 
 %initialize all day zero variables except the initial portfolio value
@@ -93,6 +93,7 @@ PositionVX2PostInitial = 0;
 sigInitial = 0;
 stoplosscount =  0;
 IsExpDate = ismember(TradeDate, ExpDates);
+Temp_IsExpDate = IsExpDate(Serial_startdate:Serial_enddate, :);
 TradeDay = TradeDay;
 stoploss = stoploss;
 VIX = VIX;
@@ -110,10 +111,10 @@ for i = 1:nr
      
       %need to figure out which fucking contracts are considered VX1 and
       %VX2 based on the start date!!!
-     ContractUnderTest1 = char(ContractExpirations(i,1));
-     ContractUnderTest2 = char(ContractExpirations(i,2));
+     ContractUnderTest1 = char(Temp_ContractExpirations(i,1));
+     ContractUnderTest2 = char(Temp_ContractExpirations(i,2));
      
-     DateUnderTest = char(TradeDate(i,1));
+     DateUnderTest = char(Temp_TradeDate(i,1));
      ColumnUnderTestOpen = 'Open';
      ColumnUnderTest = 'Close';
      ColumnUnderTestHigh = 'High';
@@ -122,7 +123,7 @@ for i = 1:nr
      DataAdjustmentDate = '03/23/2007';
      TradeDateNumTest = datenum(DataAdjustmentDate, 'mm/dd/yyyy' );
 
-     if SERIAL_DATE_DATA(i) <= TradeDateNumTest
+     if Temp_SERIAL_DATE_DATA(i) <= TradeDateNumTest
      Asset1ClosePrice = table2array(ContractsAsStructure_RowsAsDates.(ContractUnderTest1)(DateUnderTest,ColumnUnderTest));
      Asset2ClosePrice = table2array(ContractsAsStructure_RowsAsDates.(ContractUnderTest2)(DateUnderTest,ColumnUnderTest));
      Asset1OpenPrice = table2array(ContractsAsStructure_RowsAsDates.(ContractUnderTest1)(DateUnderTest,ColumnUnderTestOpen));
@@ -157,7 +158,7 @@ for i = 1:nr
      Asset2SettlePrice = table2array(ContractsAsStructure_RowsAsDates.(ContractUnderTest2)(DateUnderTest,ColumnUnderTestSettle));     
 
      end    
-     
+ % set minimum values!! - not sure why we did this again.    
         if Asset1ClosePrice == 0
         Asset1ClosePrice = Asset1SettlePrice;
         end
@@ -251,7 +252,7 @@ for i = 1:nr
            frisig_vx1(i,1) = 0;
            frisig_vx2(i,1) = 0;
            
-           if TradeDay(i) == 2
+           if Temp_TradeDay(i) == 2
            TradeVX1TargetMonday(i,1) = 0;
            TradeVX2TargetMonday(i,1) = 0;
            TradeVX1ActualMonday(i,1) = 0;
@@ -264,13 +265,13 @@ for i = 1:nr
         elseif i > 1          
             
     %nig rig for contracts pre....
-            if IsExpDate(i) == 1
+            if Temp_IsExpDate(i) == 1
                 PortfolioVX1ContractsPre(i,1) = PortfolioVX2ContractsPost(i-1,1);
                 PortfolioVX2ContractsPre(i,1) = 0;  
                 PortfolioCashPre(i,1) = PortfolioCash(i-1,1);
             end
             
-            if TradeDay(i) == 2 % this happens on monday            
+            if Temp_TradeDay(i) == 2 % this happens on monday            
                 TradeVX1TargetMonday(i,1) = frisig_vx1(i-1,1) * PortfolioNetLiqPost(i-1,1); 
                 TradeVX2TargetMonday(i,1) = frisig_vx2(i-1,1) * PortfolioNetLiqPost(i-1,1); 
                 TradeVX1ContractsMonday(i,1) = round(TradeVX1TargetMonday(i,1) / (Asset1OpenPrice*1000));
@@ -335,7 +336,7 @@ for i = 1:nr
 
                             stoplossTrigger(i,1) = 0;
 
-                                    if TradeDay(i) == 6          % this happens on friday
+                                    if Temp_TradeDay(i) == 6          % this happens on friday
                                         frisig_vx1(i,1)= (TargetWeightVX1postsig(i,1));
                                         frisig_vx2(i,1)= (TargetWeightVX2postsig(i,1));                                
                                         sig(i,1) = 0;

@@ -1,6 +1,4 @@
-function [OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn] = Gouldii_SignalsLinearOptimizer(~, SelectedStrategy, initialportfolio, StopLoss,Serial_startdate,Serial_enddate,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry)
-%function Gouldii_SignalsLinearOptimizer(~, SelectedStrategy, initialportfolio, StopLoss,Serial_startdate,Serial_enddate,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry)
-
+function [OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn] = Gouldii_SignalsLinearOptimizer(~, SelectedStrategy,initialportfolio, StopLoss,Serial_startdate,Serial_enddate,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry)
 
 addpath('Strategies');
 
@@ -120,10 +118,9 @@ elseif strcmp(OptimizedParameter2String, 'LongContangoEntry')
 elseif strcmp(OptimizedParameter2String, 'LongContango30Entry')
  LongContango30Entry = OptimizedParameter2Specific ; 
 
-end
-
-
-for j = 1:length(OptimizedParameter1)
+end 
+     
+     for j = 1:length(OptimizedParameter1)
      OptimizedParameter1Specific = OptimizedParameter1(j);
 
      %if statement to figure out which param is the opt param
@@ -153,8 +150,6 @@ for j = 1:length(OptimizedParameter1)
 %SelectedStrategy = @Gouldii_Strategy_Prime;
     
     %[sig,Exists_ContangoEntry,Exists_Contango30Entry,Exists_ContangoExit,Exists_Contango30Exit,Exists_LongContangoEntry,Exists_LongContango30Entry ] = feval(SelectedStrategy_input,Serial_startdate,Serial_enddate,CONTANGO,CONTANGO30,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry);
-
-[sig] = feval(SelectedStrategy_input,Serial_startdate,Serial_enddate,CONTANGO,CONTANGO30,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry);
 
 
     
@@ -209,20 +204,20 @@ for j = 1:length(OptimizedParameter1)
        
  end   %end of linear opt loop!!!
  
-         if  strcmp(OptimizedParameter1String,OptimizedParameter2String)
-         LinearOpt3Results = LinearOptResults;
-         break;
-         end
-
-         LinearOpt2_OUTPUT_CELL_ARRAY(m,:) = OUTPUT_CELL_ARRAY(1,:);
-            if m == 1
-                LinearOpt2Results = LinearOptResults;
-            else    
-                LinearOpt3Results = vertcat(LinearOpt2Results,LinearOptResults);
-                LinearOpt2Results = LinearOpt3Results;
-            end
+ if  strcmp(OptimizedParameter1String,OptimizedParameter2String)
+ LinearOpt3Results = LinearOptResults;
+ break;
+ end
+ 
+ LinearOpt2_OUTPUT_CELL_ARRAY(m,:) = OUTPUT_CELL_ARRAY(1,:);
+    if m == 1
+        LinearOpt2Results = LinearOptResults;
+    else    
+        LinearOpt3Results = vertcat(LinearOpt2Results,LinearOptResults);
+        LinearOpt2Results = LinearOpt3Results;
+    end
     
-end  
+ end  
 
  
 if NetLiqTotalempty == 0
@@ -283,13 +278,7 @@ xlswrite('LinearOpt3Results.xlsx',TotalLinearOpt);
 
 %load('Volatility_BuyAndHold.mat'); 
 
-
-
-
 TotalLinearOpt
-
-
-
 
 %TradeDates = datetime(SERIAL_DATE_DATA,'ConvertFrom','datenum');
 %figure(100)
