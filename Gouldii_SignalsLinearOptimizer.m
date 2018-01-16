@@ -96,14 +96,15 @@ Temp_SERIAL_DATE_DATA = SERIAL_DATE_DATA(Serial_startdate:Serial_enddate, :);
  k = 1;
  m = 1;
 
-
+counter = 0;
  % ask user for initial portfolio size...
  %       promptPortfolioInitial = {'Please Enter an Initial Portfolio Value:'};
  %       Stop_title = 'Initial Portfolio Value';
  %       num_lines = 1;
  %       PortfolioCashInitialcell = inputdlg(promptPortfolioInitial,Stop_title,num_lines);
  for m = 1:length(OptimizedParameter2)
- OptimizedParameter2Specific = OptimizedParameter2(m);     
+ OptimizedParameter2Specific = OptimizedParameter2(m);
+ 
 if strcmp(OptimizedParameter2String, 'ContangoEntry')
  ContangoEntry = OptimizedParameter2Specific ;
 
@@ -176,8 +177,11 @@ for j = 1:length(OptimizedParameter1)
     NetProfit(1,j) = cell2mat(NetLiqTotal(end,j)) - cell2mat(NetLiqTotal(1,j));
     
  
-    
-     NetLiqTotalMatrix = cell2mat(NetLiqTotal);
+     counter = counter + 1;     
+
+     NetLiqTotaldoubles = cell2mat(NetLiqTotal);
+     NetLiqTotalMatrix(:,counter) = NetLiqTotaldoubles(:,1);  
+     
      NetLiqTotalTest = NetLiqTotalMatrix(NetLiqTotalMatrix < 0);
      NetLiqTotalempty = isempty(NetLiqTotalTest);
      
@@ -207,21 +211,20 @@ for j = 1:length(OptimizedParameter1)
        LinearOptResults(j,10) = num2cell(((1+CummROR(1,j))^(365/length(Temp_SERIAL_DATE_DATA)))-1);
       %LinearOptResults(j,10) = num2cell(MaxDDindex(1,j));
       
-      
-       
+
  end   %end of linear opt loop!!!
  
          if  strcmp(OptimizedParameter1String,OptimizedParameter2String)
-         LinearOpt3Results = LinearOptResults;
+         LinearOptimizerResults = LinearOptResults;
          break;
          end
 
          LinearOpt2_OUTPUT_CELL_ARRAY(m,:) = OUTPUT_CELL_ARRAY(1,:);
             if m == 1
-                LinearOpt2Results = LinearOptResults;
+                LinearOptTemp = LinearOptResults;
             else    
-                LinearOpt3Results = vertcat(LinearOpt2Results,LinearOptResults);
-                LinearOpt2Results = LinearOpt3Results;
+                LinearOptimizerResults = vertcat(LinearOptTemp,LinearOptResults);
+                LinearOptTemp = LinearOptimizerResults;
             end
     
 end  
@@ -252,24 +255,24 @@ NetLiqTotalMatrix = NetLiqTotalMatrix(2:end,:);
 
 % this is the objective function portion!!!!
 %LinearOptResults
-[MaxSharpe,MaxSharpeIndex] = max(cell2mat(LinearOpt3Results(1:end,9))) 
-[MaxAnnualizedReturn,MaxAnnualizedReturnIndex] = max(cell2mat(LinearOpt3Results(1:end,10)))
+[MaxSharpe,MaxSharpeIndex] = max(cell2mat(LinearOptimizerResults(1:end,9))) 
+[MaxAnnualizedReturn,MaxAnnualizedReturnIndex] = max(cell2mat(LinearOptimizerResults(1:end,10)))
 
-OptContangoEntry = LinearOpt3Results{MaxSharpeIndex,1};
-OptContango30Entry = LinearOpt3Results{MaxSharpeIndex,2};
-OptContangoExit = LinearOpt3Results{MaxSharpeIndex,3};
-OptContango30Exit = LinearOpt3Results{MaxSharpeIndex,4};
-OptLongContangoEntry = LinearOpt3Results{MaxSharpeIndex,5};
-OptLongContango30Entry = LinearOpt3Results{MaxSharpeIndex,6};
-OptMaxDD = LinearOpt3Results{MaxSharpeIndex,7};
-OptNetProfit = LinearOpt3Results{MaxSharpeIndex,8};
-OptSharpeRatio = LinearOpt3Results{MaxSharpeIndex,9};
-OptAnnualizedReturn = LinearOpt3Results{MaxSharpeIndex,10};
+OptContangoEntry = LinearOptimizerResults{MaxSharpeIndex,1};
+OptContango30Entry = LinearOptimizerResults{MaxSharpeIndex,2};
+OptContangoExit = LinearOptimizerResults{MaxSharpeIndex,3};
+OptContango30Exit = LinearOptimizerResults{MaxSharpeIndex,4};
+OptLongContangoEntry = LinearOptimizerResults{MaxSharpeIndex,5};
+OptLongContango30Entry = LinearOptimizerResults{MaxSharpeIndex,6};
+OptMaxDD = LinearOptimizerResults{MaxSharpeIndex,7};
+OptNetProfit = LinearOptimizerResults{MaxSharpeIndex,8};
+OptSharpeRatio = LinearOptimizerResults{MaxSharpeIndex,9};
+OptAnnualizedReturn = LinearOptimizerResults{MaxSharpeIndex,10};
 
 
 LinearOpt3Labels = {'ContangoEntry','Contango30Entry','ContangoExit','Contango30Exit','LongContangoEntry','LongContango30Entry','MaxDD','NetProfit','SharpeRatio','AnnualizedReturn'};
 
-TotalLinearOpt3 = [LinearOpt3Results(1:end,1),LinearOpt3Results(1:end,2),LinearOpt3Results(1:end,3),LinearOpt3Results(1:end,4),LinearOpt3Results(1:end,5),LinearOpt3Results(1:end,6),LinearOpt3Results(1:end,7),LinearOpt3Results(1:end,8),LinearOpt3Results(1:end,9),LinearOpt3Results(1:end,10)];
+TotalLinearOpt3 = [LinearOptimizerResults(1:end,1),LinearOptimizerResults(1:end,2),LinearOptimizerResults(1:end,3),LinearOptimizerResults(1:end,4),LinearOptimizerResults(1:end,5),LinearOptimizerResults(1:end,6),LinearOptimizerResults(1:end,7),LinearOptimizerResults(1:end,8),LinearOptimizerResults(1:end,9),LinearOptimizerResults(1:end,10)];
               
 TotalLinearOpt = cat(1,LinearOpt3Labels, TotalLinearOpt3);
 
