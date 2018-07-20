@@ -1277,6 +1277,7 @@ if isWFA == 1
 %end
         try
              [TotalLinearOpt,sigprevious,OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn,isfirstday,cashonweekendsflag,output] = Gouldii_SignalsLinearOptimizer_v1(StrategyPath, SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate_actual,Serial_enddate_actual,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,isfirstday,startdate_string,sigprevious);
+            %[TotalLinearOpt,sigprevious,OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn,isfirstday,cashonweekendsflag,output] = Gouldii_SignalsLinearOptimizer_v1(~,            SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate_actual,Serial_enddate_actual,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,isfirstday,startdate_string,sigprevious)
                
            
             % ERROR IN ATTEMPT TO RUN LO CODE
@@ -1291,7 +1292,7 @@ if isWFA == 1
         end
 
             assignin('base','sigprevious',sigprevious);
-%try
+try
             CONTANGO = evalin('base','CONTANGO');
             CONTANGO30 = evalin('base','CONTANGO30');
             TargetWeightVX1_S30 = evalin('base','TargetWeightVX1_S30');
@@ -1299,9 +1300,9 @@ if isWFA == 1
             TargetWeightVX1_S45 = evalin('base','TargetWeightVX1_S45');
             TargetWeightVX2_S45 = evalin('base','TargetWeightVX2_S45');
             curve_tickers = evalin('base','curve_tickers');        
-%catch
-%   disp('the problem is with the evalin for the strategy inputs'); 
-%end    
+catch
+   disp('the problem is with the evalin for the strategy inputs'); 
+end    
         ContangoEntry = OptContangoEntry;
         Contango30Entry = OptContango30Entry;
         ContangoExit = OptContangoExit;

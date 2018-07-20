@@ -418,10 +418,10 @@ return;
 %        OptLongContango30Entry = OptLongContango30Entry_temp;   
 
 
-        NetLiqTotalBuyAndHold_Returns = tick2ret(NetLiqTotalBuyAndHold);
-        NetLiqTotalBuyAndHold_Scaled = ret2price(NetLiqTotalBuyAndHold_Returns,initialportfolio,1,1,'Periodic');
+%        NetLiqTotalBuyAndHold_Returns = tick2ret(NetLiqTotalBuyAndHold);
+%        NetLiqTotalBuyAndHold_Scaled = ret2price(NetLiqTotalBuyAndHold_Returns,initialportfolio,1,1,'Periodic');
 
-        TradeDate = TradeDate(Serial_startdate:Serial_enddate, :);  
+%        TradeDate = TradeDate(Serial_startdate:Serial_enddate, :);  
     
 %            fig1k = figure(1000);
 %            plot(TradeDate,NetLiqTotalBuyAndHold_Scaled)
@@ -430,12 +430,12 @@ return;
 %            hold on
         %disp('Buy and Hold Strategy complete');
 
-    return; 
+%    return; 
 
-    else
-       save('Volatility_Signals_linearopt') 
+%    else
+%       save('Volatility_Signals_linearopt') 
 
-    end
+%    end
 
 %    hold off
 %    close(fig1k);
