@@ -1,6 +1,6 @@
 %                                    LINEAR OPTIMIZATION CODE
 %
-function [TotalLinearOpt,sigprevious,OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn,isfirstday,cashonweekendsflag,output] = Gouldii_SignalsLinearOptimizer_v1(~, SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate_actual,Serial_enddate_actual,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,isfirstday,startdate_string,sigprevious)
+function [TotalLinearOpt,sigprevious,OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn,isfirstday,cashonweekendsflag,output] = Gouldii_SignalsLinearOptimizer_v1(~, SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate_actual,Serial_enddate_actual,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,isfirstday,startdate_string,sigprevious,isWFA)
 
 addpath('Strategies');
 
@@ -51,6 +51,8 @@ load('db_tradedate.mat');
             assignin('base','curve_tickers',curve_tickers);    
             assignin('base','TradeDate_NumFormat',TradeDate_NumFormat);
 
+%            evalin('base',isWFA);
+            
 %ObjectName = @(x) inputname(1);
 
 %calculate length of test vector
@@ -342,6 +344,7 @@ stratpath = 'C:\Program Files\Matlab\MATLAB Production Server\R2015a\bin\Gouldii
 strategypath = strcat(stratpath, SelectedStrategy_temp, '\');
 strategypathResults = strcat(strategypath,'Results\');
 strategypathOptParams = strcat(strategypath,'OptParams\');
+strategypathWFA = strcat(strategypath,'WFA\');
 
 now = datetime('now','Format','yyyyMMdd_HHmmss');
 now = datestr(now,'yyyymmdd_HHMMss');
@@ -351,8 +354,8 @@ edate = datestr(Serial_enddate_actual,'yyyymmdd');
 strategypath_output = strcat(strategypathResults,sdate,'_',edate,'_');
 strategypath_output = strcat(strategypath_output,'OptResultsOutputArray_',now,'.xlsx');
 
-%strategypath_complete = strcat(strategypathResults,sdate,'_',edate,'_');
-%strategypath_complete = strcat(strategypath_complete,'COMPLETE_OUTPUT_ARRAY_',now,'.xlsx');
+strategypathWFA = strcat(strategypathWFA,sdate,'_',edate,'_');
+strategypathWFA = strcat(strategypathWFA,'WFA_',now,'.xlsx');
 
 strategypath_maxdd = strcat(strategypathResults,sdate,'_',edate,'_');
 strategypath_maxdd = strcat(strategypath_maxdd,'MaxDrawdowntotal_',now,'.xlsx');
@@ -360,32 +363,48 @@ strategypath_maxdd = strcat(strategypath_maxdd,'MaxDrawdowntotal_',now,'.xlsx');
 strategypath_linearopt = strcat(strategypathOptParams,sdate,'_',edate,'_');
 strategypath_linearopt = strcat(strategypath_linearopt,'LinearOptResults_',now,'.xlsx');
 
-%if isWFA == 0
+if isWFA == 0
 
-%        try
-%            xlswrite(strategypath_output,output);      
-            %xlswrite(strategypath_complete,output);                
-%            xlswrite(strategypath_maxdd,MaxDrawdowntotal);            
-%            xlswrite(strategypath_linearopt,TotalLinearOpt);
-%        catch
-%            try
-%            system('taskkill /F /IM EXCEL.EXE');
-%            catch
-%                disp('no excel open error')
-%            end
+        try
+            xlswrite(strategypath_output,output);      
+              
+            xlswrite(strategypath_maxdd,MaxDrawdowntotal);            
+            xlswrite(strategypath_linearopt,TotalLinearOpt);
+        catch
+            try
+            system('taskkill /F /IM EXCEL.EXE');
+            catch
+                disp('no excel open error')
+            end
 
             %check to see if the directory exists, if not, create it.
             % we will need another try catch
             
-%            xlswrite(strategypath_output,output);
+            xlswrite(strategypath_output,output);
             %xlswrite(strategypath_complete,output); 
-%            xlswrite(strategypath_maxdd,MaxDrawdowntotal);
-%            xlswrite(strategypath_linearopt,TotalLinearOpt);
-%        end    
+            xlswrite(strategypath_maxdd,MaxDrawdowntotal);
+            xlswrite(strategypath_linearopt,TotalLinearOpt);
+        end    
 
 
-%else
-    
+else
+   
+%print results of IN-SAMPLE runs
+            %xlswrite(strategypathWFA,output);  
+
+
+
+end
+
+
+
+
+
+
+
+
+
+
 %end
     NetLiqOptimized(:,1) = NetLiqTotalMatrix(:,MaxSharpeIndex); 
 return;

@@ -1276,8 +1276,7 @@ if isWFA == 1
 %pause(1);
 %end
         try
-             [TotalLinearOpt,sigprevious,OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn,isfirstday,cashonweekendsflag,output] = Gouldii_SignalsLinearOptimizer_v1(StrategyPath, SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate_actual,Serial_enddate_actual,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,isfirstday,startdate_string,sigprevious);
-            %[TotalLinearOpt,sigprevious,OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn,isfirstday,cashonweekendsflag,output] = Gouldii_SignalsLinearOptimizer_v1(~,            SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate_actual,Serial_enddate_actual,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,isfirstday,startdate_string,sigprevious)
+             [TotalLinearOpt,sigprevious,OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn,isfirstday,cashonweekendsflag,output] = Gouldii_SignalsLinearOptimizer_v1(StrategyPath, SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate_actual,Serial_enddate_actual,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,isfirstday,startdate_string,sigprevious,isWFA);
                
            
             % ERROR IN ATTEMPT TO RUN LO CODE
@@ -1418,9 +1417,25 @@ end
 %(Commission,initialportfolio,Serial_enddate,Serial_startdate,VIX, 
 %disp(finaloutput);
             assignin('base','finaloutput',finaloutput);   
-            assignin('base','WFAoptoutput',WFAoptoutput);   
-disp('WFA complete');
+            assignin('base','WFAoptoutput',WFAoptoutput); 
+now = datetime('now','Format','yyyyMMdd_HHmmss');
+now = datestr(now,'yyyymmdd_HHMMss');            
 
+selectedstrategy = SelectedStrategy(1:end-2);
+strategypath = StrategyPath(1:end-11);
+strategypath = strcat(strategypath,'Reference\');
+strategypath = strcat(strategypath,selectedstrategy,'\');
+WFAstrategypath = strcat(strategypath,'WFA\');    
+WFAstrategypath = strcat(WFAstrategypath,'WFAoutput_',now,'.xlsx');            
+            
+            
+disp('WFA complete');
+ try
+ xlswrite(WFAstrategypath,finaloutput);
+
+ catch
+disp('your shit is fucked, wont save excel');
+ end
 %sigw1,sigw2,ticker1,ticker2, SERIAL_DATE_DATA, 
 %TargetWeightVX1_S30, TargetWeightVX2_S30, TradeDate, ExpDates, curve_tickers, TradeDate_NumFormat,
 %T1,T2,StopLoss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD,
@@ -1437,10 +1452,10 @@ else
 %
 
                                     try
-                                     [TotalLinearOpt,sigprevious,OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn,isfirstday,cashonweekendsflag,output] = Gouldii_SignalsLinearOptimizer_v1(StrategyPath, SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate_actual,Serial_enddate_actual,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,isfirstday,startdate_string,sigprevious);
+                                     [TotalLinearOpt,sigprevious,OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn,isfirstday,cashonweekendsflag,output] = Gouldii_SignalsLinearOptimizer_v1(StrategyPath, SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate_actual,Serial_enddate_actual,OptimizedParameter1String,opt1numofsteps,opt1lowerbound,opt1upperbound,OptimizedParameter2String,opt2numofsteps,opt2lowerbound,opt2upperbound,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,isfirstday,startdate_string,sigprevious,isWFA);
 
-                                    disp('The final trading day signal from previous run:');
-                                    disp(sigprevious)
+                                    %disp('The final trading day signal from previous run:');
+                                    %disp(sigprevious)
                                     assignin('base','sigprevious',sigprevious);
 
                                     %GUI updates and output
