@@ -950,6 +950,9 @@ function Run_LO_Callback(hObject, eventdata, handles)
 % hObject    handle to Run_LO (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+status_loading = 'Loading Data';
+set(handles.status_GUI,'String',status_loading);
+drawnow;
 load('db_historicaldata.mat');
 
 
@@ -1124,6 +1127,7 @@ startdate = datefind(Serial_startdate_actual,TradeDateSerial);
 enddate = datefind(Serial_enddate_actual,TradeDateSerial);
 
 NumOfTradeDays = enddate - startdate;
+%NumOfTradeDays = enddate - startdate ;
 startdateOutofSample = startdate +DaysInSample;
 TradeDateOutofSample = TradeDate_NumFormat;
 TradeDateOutofSample = TradeDateOutofSample(startdateOutofSample:enddate);
@@ -1233,6 +1237,10 @@ set(handles.status_GUI,'String',status_strategyrun);
 drawnow;
 
 
+
+
+
+
 % IN LOOP FOR WFA, we must check the value of the previous signal variable
 % sigprevious. It should be inside the loop at the very end so the next
 % date range inputs its value into the LO code.
@@ -1246,6 +1254,9 @@ disp('error while trying to evalin sigprevious, set to 0, investigate if this is
 end
 
 
+
+
+
 %disp('starting isWFA check now...');
 
 % -------------------------------------------------------------------------------------------------------------------------
@@ -1256,8 +1267,10 @@ end
 
 
 if isWFA == 1
+
     
-  
+ %--------------------------------------------------------------------------------------------------------------
+ % start of WFA loop
     for i = 1:NumOfPeriods
         
         %-------
@@ -1354,15 +1367,20 @@ end
     
   
     
-    %datefind again...
+    %datefind again... n OUT OF SAMPLE PERIOD
     Serial_startdate = datefind(Serial_startdate,TradeDateSerial);
     Serial_enddate = datefind(Serial_enddate,TradeDateSerial);
     
     
-    %call strategy
-    [sigprevious,sigw1,sigw2,ticker1,ticker2] = Gouldii_Strategy_Prime_v1(Serial_startdate,Serial_enddate,CONTANGO,CONTANGO30,y_CONTANGO,y_CONTANGO30,y_sig,...
-                                                                                ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,...
-                                                                                TargetWeightVX1_S30,TargetWeightVX2_S30,TargetWeightVX1_S45,TargetWeightVX2_S45,curve_tickers);
+                SelectedStrategy_temp = SelectedStrategy(1:end-2);
+                SelectedStrategy_input = str2func(SelectedStrategy_temp);
+    
+                                                                            
+ %call strategy to calculate signals for OutofSample period
+                [sigprevious,sigw1,sigw2,ticker1,ticker2] = feval(SelectedStrategy_input,Serial_startdate,Serial_enddate,CONTANGO,CONTANGO30,y_CONTANGO,y_CONTANGO30,y_sig,...
+                                                                  ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,...
+                                                                  TargetWeightVX1_S30,TargetWeightVX2_S30,TargetWeightVX1_S45,TargetWeightVX2_S45,curve_tickers,gouldiiVCO);                                                                    
+                                                                            
 if i == 1
     WFAsigw1 = sigw1;
     WFAsigw2 = sigw2;
@@ -1377,10 +1395,17 @@ end
             
 
 
-
-      
+ wfacount = num2str(i);
+ wfaperiods = num2str(NumOfPeriods);
+ statuswfa = strcat('End of run_', wfacount, ' of total_', wfaperiods, ' number of runs');
+ %statuswfa = strcat('End of run ', wfacount);
+ %statuswfa = strcat(statuswfa,'of total',' ');
+ %statuswfa = strcat(statuswfa,wfaperiods);
+ %statuswfa = strcat(statuswfa,' number of runs');
+ disp(statuswfa);
     end
-  
+ %--------------------------------------------------------------------------------------------------------------
+ % end of WFA loop
 
     
             assignin('base','WFAoptparams',WFAoptparams);
@@ -1402,24 +1427,27 @@ end
             % Trades and Performance input parameters below!!
 sigw1 = WFAsigw1;
 sigw2 = WFAsigw2;
+% ************************************************************
+% set out of sample date range
+% **************************************************************
 Serial_enddate = enddate;
 Serial_startdate = startdateOutofSample;
 ticker1 = WFAticker1;
 ticker2 = WFAticker2;
 try
-                finaloutput = Gouldii_TradesPerformanceFunction_v1(Commission,initialportfolio,Serial_enddate,Serial_startdate,VIX, sigw1,sigw2,ticker1,ticker2, SERIAL_DATE_DATA,...
+                WFAfinaloutput = Gouldii_TradesPerformanceFunction_v1(Commission,initialportfolio,Serial_enddate,Serial_startdate,VIX, sigw1,sigw2,ticker1,ticker2, SERIAL_DATE_DATA,...
                                                                     TargetWeightVX1_S30, TargetWeightVX2_S30, TradeDate, ExpDates, curve_tickers,...
                                                                     TradeDate_NumFormat,T1,T2,StopLoss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD,...
                                                                     VX1_close,VX1_open,VX1_high,VX1_low,VX2_close,VX2_open,VX2_high,VX2_low,cashonweekendsflag);
 catch
 disp('Error occurs in GUI code while trying to run T&P code');
 end
-%(Commission,initialportfolio,Serial_enddate,Serial_startdate,VIX, 
-%disp(finaloutput);
-            assignin('base','finaloutput',finaloutput);   
+            assignin('base','WFAfinaloutput',WFAfinaloutput);   
             assignin('base','WFAoptoutput',WFAoptoutput); 
-now = datetime('now','Format','yyyyMMdd_HHmmss');
-now = datestr(now,'yyyymmdd_HHMMss');            
+%            assignin('base','buyandholdsigw1',buyandholdsigw1);             
+%            assignin('base','buyandholdsigw2',buyandholdsigw2); 
+            now = datetime('now','Format','yyyyMMdd_HHmmss');
+            now = datestr(now,'yyyymmdd_HHMMss');            
 
 selectedstrategy = SelectedStrategy(1:end-2);
 strategypath = StrategyPath(1:end-11);
@@ -1428,24 +1456,106 @@ strategypath = strcat(strategypath,selectedstrategy,'\');
 WFAstrategypath = strcat(strategypath,'WFA\');    
 WFAstrategypath = strcat(WFAstrategypath,'WFAoutput_',now,'.xlsx');            
             
-            
+
+NetLiqTotal = WFAfinaloutput(3:end,30);
+SharpeRatio = cell2mat(WFAfinaloutput(end,47));
+CummRORcell = WFAfinaloutput(end,46);
+CummROR = cell2mat(CummRORcell);
+NetProfit = cell2mat(NetLiqTotal(end)) - cell2mat(NetLiqTotal(1));
+NetLiqTotaldoubles = cell2mat(NetLiqTotal);
+
+[MaxDD,MaxDDindex] = maxdrawdown(NetLiqTotaldoubles);
+
+AnnualizedReturn = (((1+CummROR))^(365/length(WFAsigw1)))-1;
+
+
+disp('Sharpe Ratio for OutOfSample Run:');
+disp(SharpeRatio);
+disp('NetProfit for OutOfSample Run:');
+disp(NetProfit);
+disp('AnnualizedReturn for OutOfSample Run:');
+disp(AnnualizedReturn);
+disp('Max Drawdown for OutOfSample Run:');
+disp(MaxDD);
+
+
+
+% BUY AND HOLD FOR WFA GRAPHING
+
+                    StopLoss = 100;
+                    cashonweekendsflag = 0;
+                    
+    %call strategy for buyandhold graphing 
+    [sigprevious,sigw1,sigw2,ticker1,ticker2] = Gouldii_Strategy_BuyandHold_v1(Serial_startdate,Serial_enddate,CONTANGO,CONTANGO30,y_CONTANGO,y_CONTANGO30,y_sig,...
+                                                                                ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,...
+                                                                                TargetWeightVX1_S30,TargetWeightVX2_S30,TargetWeightVX1_S45,TargetWeightVX2_S45,curve_tickers,gouldiiVCO);
+       
+       
+try
+                Buyandholdfinaloutput = Gouldii_TradesPerformanceFunction_v1(Commission,initialportfolio,Serial_enddate,Serial_startdate,VIX, sigw1,sigw2,ticker1,ticker2, SERIAL_DATE_DATA,...
+                                                                    TargetWeightVX1_S30, TargetWeightVX2_S30, TradeDate, ExpDates, curve_tickers,...
+                                                                    TradeDate_NumFormat,T1,T2,StopLoss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD,...
+                                                                    VX1_close,VX1_open,VX1_high,VX1_low,VX2_close,VX2_open,VX2_high,VX2_low,cashonweekendsflag);
+catch
+disp('Error occurs in GUI code while trying to run T&P code');
+end
+
+
+BuyandholdNetLiqTotal = Buyandholdfinaloutput(3:end,30);
+BuyandholdSharpeRatio = cell2mat(Buyandholdfinaloutput(end,47));
+BuyandholdCummRORcell = Buyandholdfinaloutput(end,46);
+BuyandholdCummROR = cell2mat(BuyandholdCummRORcell);
+BuyandholdNetProfit = cell2mat(BuyandholdNetLiqTotal(end)) - cell2mat(BuyandholdNetLiqTotal(1));
+BuyandholdNetLiqTotaldoubles = cell2mat(BuyandholdNetLiqTotal);
+
+[BuyandholdMaxDD,BuyandholdMaxDDindex] = maxdrawdown(BuyandholdNetLiqTotaldoubles);
+
+BuyandholdAnnualizedReturn = (((1+BuyandholdCummROR))^(365/length(sigw1)))-1;
+
+                                    disp('Running BuyandHold strategy for graphing');
+                                    
+disp('Sharpe Ratio for BuyandHold Run:');
+disp(BuyandholdSharpeRatio);
+disp('NetProfit for BuyandHold Run:');
+disp(BuyandholdNetProfit);
+disp('AnnualizedReturn for BuyandHold Run:');
+disp(BuyandholdAnnualizedReturn);
+disp('Max Drawdown for BuyandHold Run:');
+disp(BuyandholdMaxDD);
+
+ %       NetLiqTotalBuyAndHold_Returns = tick2ret(BuyandholdNetLiqTotaldoubles);
+ %       NetLiqTotalBuyAndHold_Scaled = ret2price(NetLiqTotalBuyAndHold_Returns,initialportfolio,1,1,'Periodic');
+        TradeDate = TradeDate(Serial_startdate:Serial_enddate, :);
+        figure(40) 
+       % yyaxis left        
+        plot(TradeDate,BuyandholdNetLiqTotaldoubles,'g');
+        set(gca,'YScale','log')
+        hold on
+        plot(TradeDate,NetLiqTotaldoubles);
+        hold off
+        
 disp('WFA complete');
  try
- xlswrite(WFAstrategypath,finaloutput);
+ xlswrite(WFAstrategypath,WFAfinaloutput);
 
  catch
 disp('your shit is fucked, wont save excel');
  end
-%sigw1,sigw2,ticker1,ticker2, SERIAL_DATE_DATA, 
-%TargetWeightVX1_S30, TargetWeightVX2_S30, TradeDate, ExpDates, curve_tickers, TradeDate_NumFormat,
-%T1,T2,StopLoss,TradeDay,CONTANGO, CONTANGO30, ROLL_YIELD,
-%VX1_close,VX1_open,VX1_high,VX1_low,VX2_close,VX2_open,VX2_high,VX2_low,
-%cashonweekendsflag)
+
             
-                
+% END OF WFA CODE                
             
-            
-            
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+% =========================================================================            
+% ==========================  LO only!   ==================================
+% =========================================================================
+
 else
     
 %the following code is run if NOT using WFA
@@ -1456,8 +1566,35 @@ else
 
                                     %disp('The final trading day signal from previous run:');
                                     %disp(sigprevious)
-                                    assignin('base','sigprevious',sigprevious);
+                                    assignin('base','sigprevious',sigprevious);                                    
+                                                                  
+LOoutput = output;  
 
+LONetLiqTotal = output(3:end,30);
+LOSharpeRatio = cell2mat(output(end,47));
+LOCummRORcell = output(end,46);
+LOCummROR = cell2mat(LOCummRORcell);
+LONetProfit = cell2mat(LONetLiqTotal(end)) - cell2mat(LONetLiqTotal(1));
+LONetLiqTotaldoubles = cell2mat(LONetLiqTotal);
+
+[LOMaxDD,LOMaxDDindex] = maxdrawdown(LONetLiqTotaldoubles);
+
+LOAnnualizedReturn = (((1+LOCummROR))^(365/length(LONetLiqTotal)))-1;
+
+
+disp('Sharpe Ratio for LO Run:');
+disp(LOSharpeRatio);
+disp('NetProfit for LO Run:');
+disp(LONetProfit);
+disp('AnnualizedReturn for LO Run:');
+disp(LOAnnualizedReturn);
+disp('Max Drawdown for LO Run:');
+disp(LOMaxDD);                                  
+                                    
+                                    
+                                    
+                                    
+                                    
                                     %GUI updates and output
                                     %-----------------------------------------------------------------------------------------
                                                 set(handles.Input_ContangoEntry, 'String', OptContangoEntry) 
@@ -1504,15 +1641,33 @@ else
 
                                     set(handles.OutputTextBox,'String', outputstring)             
 
-
-                                    set(handles.status_GUI,'String',status_end);
-                                    pause(5)
-                                    set(handles.status_GUI,'String',status_start);
-                                    guidata(hObject, handles);
-
-
+                                    disp('Running BuyandHold strategy for graphing');
+SelectedStrategy = 'Gouldii_Strategy_BuyandHold_v1.m';
+%run buyandhold for LO graphing                                    
+                                     [TotalLinearOpt,sigprevious,OptContangoEntry,OptContango30Entry,OptContangoExit,OptContango30Exit,OptLongContangoEntry,OptLongContango30Entry,OptMaxDD,OptNetProfit,OptSharpeRatio,OptAnnualizedReturn,isfirstday,cashonweekendsflag,output] = Gouldii_SignalsLinearOptimizer_v1(StrategyPath, SelectedStrategy, Commission, initialportfolio, StopLoss,Serial_startdate_actual,Serial_enddate_actual,OptimizedParameter1String,0,0,0,OptimizedParameter2String,0,0,0,ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,isfirstday,startdate_string,sigprevious,isWFA);
+                                    
 
 
+BuyandholdNetLiqTotal = output(3:end,30);
+BuyandholdSharpeRatio = cell2mat(output(end,47));
+BuyandholdCummRORcell = output(end,46);
+BuyandholdCummROR = cell2mat(BuyandholdCummRORcell);
+BuyandholdNetProfit = cell2mat(BuyandholdNetLiqTotal(end)) - cell2mat(BuyandholdNetLiqTotal(1));
+BuyandholdNetLiqTotaldoubles = cell2mat(BuyandholdNetLiqTotal);
+
+[BuyandholdMaxDD,BuyandholdMaxDDindex] = maxdrawdown(BuyandholdNetLiqTotaldoubles);
+
+BuyandholdAnnualizedReturn = (((1+BuyandholdCummROR))^(365/length(BuyandholdNetLiqTotal)))-1;
+
+
+disp('Sharpe Ratio for Buyandhold Run:');
+disp(BuyandholdSharpeRatio);
+disp('NetProfit for Buyandhold Run:');
+disp(BuyandholdNetProfit);
+disp('AnnualizedReturn for Buyandhold Run:');
+disp(BuyandholdAnnualizedReturn);
+disp('Max Drawdown for Buyandhold Run:');
+disp(BuyandholdMaxDD); 
 
 
                                     % ERROR IN ATTEMPT TO RUN LO CODE
@@ -1525,9 +1680,22 @@ else
                                     drawnow; 
                                     end
 
-
-
-                                    
+    %datefind again...
+    Serial_startdate = datefind(Serial_startdate_actual,SERIAL_DATE_DATA);
+    Serial_enddate = datefind(Serial_enddate_actual,SERIAL_DATE_DATA);                                    
+        TradeDate = TradeDate(Serial_startdate:Serial_enddate, :);
+        figure(40)   
+        plot(TradeDate,BuyandholdNetLiqTotaldoubles,'g');
+        set(gca,'YScale','log')
+        hold on
+        plotyy(TradeDate,LONetLiqTotaldoubles,TradeDate,[gouldiiVCO,CONTANGO.*100,CONTANGO30.*100]);
+        hold off
+        
+                                    set(handles.status_GUI,'String',status_end);
+                                    pause(3)
+                                    set(handles.status_GUI,'String',status_start);
+                                    guidata(hObject, handles);
+xlswrite('LinearOptResults.xlsx',TotalLinearOpt);                                    
 % end of run                                    
 end
 

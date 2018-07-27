@@ -178,7 +178,9 @@ counter = 0;
 
                 SelectedStrategy_temp = SelectedStrategy(1:end-2);
                 SelectedStrategy_input = str2func(SelectedStrategy_temp);
-
+                
+                
+                % Determine if strategy is BuyandHold
                 if strcmp(SelectedStrategy, 'Gouldii_Strategy_BuyandHold_v1.m') 
                     StopLoss = 100;
                     cashonweekendsflag = 0;
@@ -196,7 +198,7 @@ counter = 0;
 try
                 [sigprevious,sigw1,sigw2,ticker1,ticker2] = feval(SelectedStrategy_input,Serial_startdate,Serial_enddate,CONTANGO,CONTANGO30,y_CONTANGO,y_CONTANGO30,y_sig,...
                                                                   ContangoEntry,Contango30Entry,ContangoExit,Contango30Exit,LongContangoEntry,LongContango30Entry,...
-                                                                  TargetWeightVX1_S30,TargetWeightVX2_S30,TargetWeightVX1_S45,TargetWeightVX2_S45,curve_tickers);
+                                                                  TargetWeightVX1_S30,TargetWeightVX2_S30,TargetWeightVX1_S45,TargetWeightVX2_S45,curve_tickers,gouldiiVCO);
  
 
 
@@ -303,7 +305,7 @@ end
 
 
     %xlswrite('TOTAL_OUTPUT_ARRAY.xlsx',TOTAL_OUTPUT_ARRAY);
-    %xlswrite('LinearOptResults.xlsx',LinearOpt3Results);
+    xlswrite('LinearOptResults.xlsx',LinearOptResults);
 
     %remove the initial value row from the net liq output array
     NetLiqTotalMatrix = NetLiqTotalMatrix(2:end,:);
@@ -390,7 +392,7 @@ if isWFA == 0
 else
    
 %print results of IN-SAMPLE runs
-            %xlswrite(strategypathWFA,output);  
+            xlswrite(strategypathWFA,output);  
 
 
 
